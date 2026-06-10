@@ -216,3 +216,20 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Large data files
+*.pdf
+*.csv
+
+# Vector store
+vectorstore/
+
+# Virtual environment
+farmiq_env/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc

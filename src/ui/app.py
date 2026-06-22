@@ -32,8 +32,29 @@ district = st.sidebar.selectbox(
     [
         "Guntur", "Krishna", "West Godavari",
         "East Godavari", "Kurnool", "Nellore",
+        "Visakhapatnam", "Vizianagaram",
+        "Srikakulam", "Prakasam", "Chittoor",
+        "Kadapa", "Anantapur", "Eluru",
+        "Bapatla", "Palnadu", "NTR District",
+        "Sri Potti Sriramulu Nellore",
+        "Alluri Sitharama Raju", "Anakapalli",
+        "Kakinada", "Konaseema",
+        "Sri Sathya Sai", "Tirupati",
+
+        # Telangana Districts
         "Warangal", "Karimnagar", "Khammam",
-        "Nizamabad"
+        "Nizamabad", "Hyderabad", "Medchal",
+        "Rangareddy", "Sangareddy", "Siddipet",
+        "Nalgonda", "Suryapet", "Mahbubnagar",
+        "Nagarkurnool", "Wanaparthy", "Jogulamba",
+        "Gadwal", "Narayanpet", "Mahabubabad",
+        "Bhadradri Kothagudem", "Mulugu",
+        "Jayashankar Bhupalpally", "Peddapalli",
+        "Jagtial", "Rajanna Sircilla", "Kamareddy",
+        "Nirmal", "Adilabad", "Kumuram Bheem",
+        "Mancherial", "Asifabad", "Medak",
+        "Vikarabad", "Yadadri Bhuvanagiri",
+        "Jangaon", "Hanamkonda"
     ]
 )
 
@@ -100,7 +121,10 @@ with tab2:
         [
             "Paddy", "Cotton", "Maize", "Groundnut",
             "Sunflower", "Redgram", "Blackgram",
-            "Greengram", "Jowar", "Bajra"
+            "Greengram", "Jowar", "Bajra", "Wheat",
+            "Sugarcane", "Turmeric", "Chilli",
+            "Tomato", "Onion", "Brinjal", "Okra",
+            "Banana", "Mango", "Coconut"
         ]
     )
 
@@ -131,7 +155,11 @@ with tab3:
         "Select Your Crop for Weather Advisory",
         [
             "Paddy", "Cotton", "Maize", "Groundnut",
-            "Sunflower", "Redgram", "Tomato", "Chilli"
+            "Sunflower", "Redgram", "Blackgram",
+            "Greengram", "Jowar", "Bajra", "Wheat",
+            "Sugarcane", "Turmeric", "Chilli",
+            "Tomata", "Onion", "Brinjal", "Okra",
+            "Banana", "Mango", "Coconut"
         ]
     )
 
@@ -161,8 +189,12 @@ with tab4:
     pest_crop = st.selectbox(
         "Select Affected Crop",
         [
-            "Paddy", "Cotton", "Maize", "Tomato",
-            "Chilli", "Groundnut", "Redgram", "Wheat"
+            "Paddy", "Cotton", "Maize", "Groundnut",
+            "Sunflower", "Redgram", "Blackgram",
+            "Greengram", "Jowar", "Bajra", "Wheat", 
+            "Sugarcane", "Turmeric", "Chilli", 
+            "Tomato", "Onion", "Brinjal", "Okra", 
+            "Banana", "Mango", "Coconut"
         ]
     )
 

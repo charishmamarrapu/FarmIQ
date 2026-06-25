@@ -104,7 +104,7 @@ python src\agents\market_price_agent.py
 ## Test Scenario
 Query regarding Paddy prices in Krishna district.
 ## Observations
-* Agent executed successfully.
+* Agent executed is fulfill successfully.
 * Generated market advisory.
 * Historical mandi data retrieved successfully.
 * Sell/Hold recommendation generated.
@@ -197,7 +197,7 @@ capture() takes 1 positional argument but 3 were given
 Impact:
 No impact on system functionality.
 Severity:
-Low
+Low, 
 ---
 ## Issue 2 – Mandi API Failure
 ```text

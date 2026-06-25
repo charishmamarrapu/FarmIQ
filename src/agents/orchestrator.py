@@ -6,6 +6,7 @@ from agents.crop_advisory_agent import CropAdvisoryAgent
 from agents.market_price_agent import MarketPriceAgent
 from agents.weather_agent import WeatherAgent
 from agents.pest_disease_agent import PestDiseaseAgent
+from agents.scheme_agent import SchemeAgent
 
 class Orchestrator:
     def __init__(self):
@@ -14,15 +15,28 @@ class Orchestrator:
         self.market_agent  = MarketPriceAgent()
         self.weather_agent = WeatherAgent()
         self.pest_agent    = PestDiseaseAgent()
-        print("✅ All 4 agents ready!")
+        self.scheme_agent  = SchemeAgent()
+        print("✅ All 5 agents ready!")
 
     def route(self, query: str, language: str = "English", **kwargs):
         """Decides which agent to call based on query"""
         query_lower = query.lower()
 
         if any(word in query_lower for word in
-               ["price", "sell", "mandi", "market",
-                "rate", "cost", "buy"]):
+               ["scheme", "eligib", "pm-kisan", "pmfby",
+                "subsidy", "benefit", "government",
+                "insurance", "kisan"]):
+            print("→ Routing to Scheme Agent 🏛️")
+            return self.scheme_agent.ask(
+                kwargs.get("land_size", "2"),
+                kwargs.get("income", "50000"),
+                kwargs.get("district", "Guntur"),
+                language
+            )
+
+        elif any(word in query_lower for word in
+                 ["price", "sell", "mandi", "market",
+                  "rate", "cost", "buy"]):
             print("→ Routing to Market Price Agent 💰")
             return self.market_agent.ask(
                 kwargs.get("crop", "paddy"),
@@ -55,7 +69,8 @@ class Orchestrator:
             print("→ Routing to Crop Advisory Agent 🌾")
             return self.crop_agent.ask(query, language)
 
-# Test all 4 agents
+
+# Test all 5 agents
 if __name__ == "__main__":
     orch = Orchestrator()
 
@@ -92,4 +107,14 @@ if __name__ == "__main__":
         "Yellow leaves on my tomato plant",
         crop="Tomato",
         symptoms="yellow leaves curling"
+    ))
+
+    print("\n" + "="*60)
+    print("TEST 5 — Scheme Agent")
+    print("="*60)
+    print(orch.route(
+        "Which government schemes am I eligible for?",
+        district="Guntur",
+        land_size="2",
+        income="50000"
     ))

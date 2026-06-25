@@ -17,7 +17,7 @@ st.set_page_config(
 def load_orchestrator():
     return Orchestrator()
 
-# ── Language Toggle ──────────────────────────────────
+# ── Sidebar ──────────────────────────────────────────
 st.sidebar.title("🌾 FarmIQ")
 st.sidebar.markdown("Multi-Agent Agricultural Advisory System")
 st.sidebar.markdown("---")
@@ -30,6 +30,7 @@ language = st.sidebar.radio(
 district = st.sidebar.selectbox(
     "Select Your District",
     [
+        # Andhra Pradesh Districts
         "Guntur", "Krishna", "West Godavari",
         "East Godavari", "Kurnool", "Nellore",
         "Visakhapatnam", "Vizianagaram",
@@ -40,7 +41,6 @@ district = st.sidebar.selectbox(
         "Alluri Sitharama Raju", "Anakapalli",
         "Kakinada", "Konaseema",
         "Sri Sathya Sai", "Tirupati",
-
         # Telangana Districts
         "Warangal", "Karimnagar", "Khammam",
         "Nizamabad", "Hyderabad", "Medchal",
@@ -65,16 +65,18 @@ st.sidebar.markdown("Charishma | Likhitha | Hasini")
 # ── Main Title ───────────────────────────────────────
 st.title("🌾 FarmIQ — Agricultural Advisory System")
 st.markdown(
-    "AI-powered advice for farmers in Andhra Pradesh and Telangana"
+    "AI-powered advice for farmers in "
+    "Andhra Pradesh and Telangana"
 )
 st.markdown("---")
 
 # ── Tabs ─────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🌾 Crop Advisory",
     "💰 Market Price",
     "🌤️ Weather Alert",
-    "🐛 Pest & Disease"
+    "🐛 Pest & Disease",
+    "🏛️ Govt Schemes"
 ])
 
 # ── TAB 1: Crop Advisory ─────────────────────────────
@@ -87,13 +89,16 @@ with tab1:
 
     crop_question = st.text_area(
         "Ask your crop question:",
-        placeholder="Example: What is the best crop to grow in Kharif season?",
+        placeholder="Example: What is the best crop "
+                    "to grow in Kharif season?",
         height=100
     )
 
     if st.button("Get Crop Advice 🌾", key="crop_btn"):
         if crop_question:
-            with st.spinner("Getting advice from agricultural documents..."):
+            with st.spinner(
+                "Getting advice from agricultural documents..."
+            ):
                 try:
                     orch = load_orchestrator()
                     answer = orch.route(
@@ -141,7 +146,7 @@ with tab2:
                 st.success("✅ Price Advisory Ready!")
                 st.markdown(answer)
 
-                # Price chart — Likhitha adds this
+                # Price Chart
                 st.subheader("📊 Historical Price Trend")
                 import pandas as pd
                 price_data = pd.DataFrame({
@@ -179,11 +184,8 @@ with tab3:
         "Select Your Crop for Weather Advisory",
         [
             "Paddy", "Cotton", "Maize", "Groundnut",
-            "Sunflower", "Redgram", "Blackgram",
-            "Greengram", "Jowar", "Bajra", "Wheat",
-            "Sugarcane", "Turmeric", "Chilli",
-            "Tomata", "Onion", "Brinjal", "Okra",
-            "Banana", "Mango", "Coconut"
+            "Sunflower", "Redgram", "Tomato",
+            "Chilli", "Wheat", "Sugarcane"
         ]
     )
 
@@ -192,7 +194,8 @@ with tab3:
             try:
                 orch = load_orchestrator()
                 answer = orch.route(
-                    f"What is the weather forecast and impact on my crop?",
+                    "What is the weather forecast "
+                    "and impact on my crop?",
                     language=language,
                     crop=weather_crop,
                     district=district
@@ -207,30 +210,32 @@ with tab4:
     st.header("🐛 Pest & Disease Identifier")
     st.markdown(
         "Describe your crop symptoms and get "
-        "pest or disease identification with treatment advice."
+        "pest or disease identification with "
+        "treatment advice."
     )
 
     pest_crop = st.selectbox(
         "Select Affected Crop",
         [
-            "Paddy", "Cotton", "Maize", "Groundnut",
-            "Sunflower", "Redgram", "Blackgram",
-            "Greengram", "Jowar", "Bajra", "Wheat", 
-            "Sugarcane", "Turmeric", "Chilli", 
-            "Tomato", "Onion", "Brinjal", "Okra", 
-            "Banana", "Mango", "Coconut"
+            "Paddy", "Cotton", "Maize", "Tomato",
+            "Chilli", "Groundnut", "Redgram",
+            "Wheat", "Sugarcane", "Onion"
         ]
     )
 
     symptoms = st.text_area(
         "Describe the symptoms you see:",
-        placeholder="Example: Leaves are turning yellow and curling at the edges",
+        placeholder="Example: Leaves are turning "
+                    "yellow and curling at the edges",
         height=100
     )
 
     if st.button("Identify Pest/Disease 🐛", key="pest_btn"):
         if symptoms:
-            with st.spinner("Analyzing symptoms from pest management documents..."):
+            with st.spinner(
+                "Analyzing symptoms from pest "
+                "management documents..."
+            ):
                 try:
                     orch = load_orchestrator()
                     answer = orch.route(
@@ -245,3 +250,77 @@ with tab4:
                     st.error(f"Error: {e}")
         else:
             st.warning("Please describe the symptoms first!")
+
+# ── TAB 5: Government Schemes ────────────────────────
+with tab5:
+    st.header("🏛️ Government Scheme Finder")
+    st.markdown(
+        "Find out which government schemes "
+        "you are eligible for based on your details."
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        land_size = st.number_input(
+            "Land Size (in acres)",
+            min_value=0.1,
+            max_value=100.0,
+            value=2.0,
+            step=0.5
+        )
+
+    with col2:
+        income = st.number_input(
+            "Annual Income (in Rupees)",
+            min_value=0,
+            max_value=1000000,
+            value=50000,
+            step=5000
+        )
+
+    if st.button(
+        "Check Scheme Eligibility 🏛️",
+        key="scheme_btn"
+    ):
+        with st.spinner("Checking government schemes..."):
+            try:
+                orch = load_orchestrator()
+                answer = orch.route(
+                    "government scheme eligibility",
+                    language=language,
+                    district=district,
+                    land_size=str(land_size),
+                    income=str(income)
+                )
+                st.success("✅ Scheme Information Ready!")
+                st.markdown(answer)
+
+                # Scheme Cards
+                st.subheader("📋 Major Schemes to Check")
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.info(
+                        "**PM-KISAN**\n\n"
+                        "Rs 6,000 per year income "
+                        "support for all landholding farmers"
+                    )
+                    st.info(
+                        "**PMFBY**\n\n"
+                        "Crop insurance against natural "
+                        "calamities, pests and diseases"
+                    )
+                with col2:
+                    st.info(
+                        "**PM Kisan Maan Dhan Yojana**\n\n"
+                        "Rs 3,000 monthly pension for "
+                        "small and marginal farmers"
+                    )
+                    st.info(
+                        "**Kisan Credit Card**\n\n"
+                        "Easy credit access for crop "
+                        "production and allied activities"
+                    )
+
+            except Exception as e:
+                st.error(f"Error: {e}")

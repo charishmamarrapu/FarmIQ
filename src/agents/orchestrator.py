@@ -7,6 +7,7 @@ from agents.market_price_agent import MarketPriceAgent
 from agents.weather_agent import WeatherAgent
 from agents.pest_disease_agent import PestDiseaseAgent
 from agents.scheme_agent import SchemeAgent
+from agents.fertilizer_agent import FertilizerAgent
 
 class Orchestrator:
     def __init__(self):
@@ -16,7 +17,8 @@ class Orchestrator:
         self.weather_agent = WeatherAgent()
         self.pest_agent    = PestDiseaseAgent()
         self.scheme_agent  = SchemeAgent()
-        print("✅ All 5 agents ready!")
+        self.fertilizer_agent = FertilizerAgent()
+        print("✅ All 6 agents ready!")
 
     def route(self, query: str, language: str = "English", **kwargs):
         """Decides which agent to call based on query"""
@@ -62,6 +64,18 @@ class Orchestrator:
             return self.pest_agent.ask(
                 kwargs.get("crop", "paddy"),
                 kwargs.get("symptoms", query),
+                language
+            )
+
+        elif any(word in query_lower for word in
+                 ["fertilizer", "npk", "nitrogen", "phosphorus",
+                  "potassium", "manure", "urea", "dap"]):
+            print("→ Routing toFertilizer Agent 🌱")
+            return self.fertilizer_agent.ask(
+                kwargs.get("crop", "paddy"),
+                float(kwargs.get("land_size", "2")),
+                kwargs.get("soil_type", "Claay Loam"),
+                kwargs.get("district", "Guntur"),
                 language
             )
 

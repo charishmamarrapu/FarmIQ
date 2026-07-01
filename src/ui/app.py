@@ -78,12 +78,13 @@ st.markdown(
 st.markdown("---")
 
 # ── Tabs ─────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "🌾 Crop Advisory",
     "💰 Market Price",
     "🌤️ Weather Alert",
     "🐛 Pest & Disease",
-    "🏛️ Govt Schemes"
+    "🏛️ Govt Schemes",
+    "🌱 Fertilizer Calc"
 ])
 
 # ── TAB 1: Crop Advisory ─────────────────────────────
@@ -341,6 +342,98 @@ with tab5:
                         "**Kisan Credit Card**\n\n"
                         "Easy credit access for crop "
                         "production and allied activities"
+                    )
+
+            except Exception as e:
+                st.error(f"Error: {e}")
+
+# ── TAB 6: Fertilizer Calculator ─────────────────────
+with tab6:
+    st.header("🌱 Fertilizer Calculator")
+    st.markdown(
+        "Calculate the optimal fertilizer quantity "
+        "and cost for your crop and land size."
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        fert_crop = st.selectbox(
+            "Select Your Crop",
+            [
+                "Paddy", "Cotton", "Maize", "Groundnut",
+                "Sunflower", "Redgram", "Blackgram",
+                "Greengram", "Jowar", "Bajra", "Wheat",
+                "Sugarcane", "Turmeric", "Chilli",
+                "Tomato", "Onion", "Brinjal", "Okra",
+                "Banana", "Mango", "Coconut",
+                "Soybean", "Sesame", "Castor", "Ragi"
+            ],
+            key="fert_crop"
+        )
+        fert_land = st.number_input(
+            "Land Size (in acres)",
+            min_value=0.5,
+            max_value=100.0,
+            value=2.0,
+            step=0.5,
+            key="fert_land"
+        )
+
+    with col2:
+        soil_type = st.selectbox(
+            "Select Soil Type",
+            [
+                "Clay Loam", "Sandy Loam", "Black Cotton Soil",
+                "Red Soil", "Alluvial Soil", "Loamy Sand",
+                "Silty Clay", "Sandy Clay Loam"
+            ]
+        )
+        st.info(
+            "💡 **Tip:** Select the correct soil type "
+            "for accurate fertilizer recommendations"
+        )
+
+    if st.button(
+        "Calculate Fertilizer 🌱",
+        key="fert_btn"
+    ):
+        with st.spinner(
+            "Calculating optimal fertilizer plan..."
+        ):
+            try:
+                orch = load_orchestrator()
+                answer = orch.route(
+                    "fertilizer recommendation",
+                    language=language,
+                    crop=fert_crop,
+                    land_size=str(fert_land),
+                    soil_type=soil_type,
+                    district=district
+                )
+                st.success("✅ Fertilizer Plan Ready!")
+                st.markdown(answer)
+
+                # Summary cards
+                st.subheader("📊 Key Nutrients for Plants")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.info(
+                        "**Nitrogen (N)**\n\n"
+                        "Promotes leaf and stem growth. "
+                        "Source: Urea, DAP"
+                    )
+                with col2:
+                    st.info(
+                        "**Phosphorus (P)**\n\n"
+                        "Promotes root growth. "
+                        "Source: SSP, DAP"
+                    )
+                with col3:
+                    st.info(
+                        "**Potassium (K)**\n\n"
+                        "Promotes fruit quality. "
+                        "Source: MOP, SOP"
                     )
 
             except Exception as e:

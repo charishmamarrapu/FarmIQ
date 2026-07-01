@@ -5,6 +5,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import streamlit as st
 from agents.orchestrator import Orchestrator
 
+# ── Load API Keys from Streamlit Secrets ────────────
+try:
+    os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+    os.environ["OPENWEATHER_API_KEY"] = st.secrets["OPENWEATHER_API_KEY"]
+except:
+    pass  # Falls back to .env file locally
+
 # ── Page Configuration ──────────────────────────────
 st.set_page_config(
     page_title="FarmIQ - Agricultural Advisory",
@@ -129,7 +136,11 @@ with tab2:
             "Greengram", "Jowar", "Bajra", "Wheat",
             "Sugarcane", "Turmeric", "Chilli",
             "Tomato", "Onion", "Brinjal", "Okra",
-            "Banana", "Mango", "Coconut"
+            "Banana", "Mango", "Coconut",
+            "Soybean", "Sesame", "Castor",
+            "Pearl Millet", "Finger Millet",
+            "Black Pepper", "Cashew", "Coffee",
+            "Cardamom", "Areca Nut"
         ]
     )
 
@@ -184,8 +195,15 @@ with tab3:
         "Select Your Crop for Weather Advisory",
         [
             "Paddy", "Cotton", "Maize", "Groundnut",
-            "Sunflower", "Redgram", "Tomato",
-            "Chilli", "Wheat", "Sugarcane"
+            "Sunflower", "Redgram", "Blackgram",
+            "Greengram", "Jowar", "Bajra", "Wheat",
+            "Sugarcane", "Turmeric", "Chilli",
+            "Tomato", "Onion", "Brinjal", "Okra",
+            "Banana", "Mango", "Coconut",
+            "Soybean", "Sesame", "Castor",
+            "Pearl Millet", "Finger Millet",
+            "Black Pepper", "Cashew", "Coffee",
+            "Cardamom", "Areca Nut"
         ]
     )
 
@@ -217,9 +235,12 @@ with tab4:
     pest_crop = st.selectbox(
         "Select Affected Crop",
         [
-            "Paddy", "Cotton", "Maize", "Tomato",
-            "Chilli", "Groundnut", "Redgram",
-            "Wheat", "Sugarcane", "Onion"
+            "Paddy", "Cotton", "Maize", "Groundnut",
+            "Sunflower", "Redgram", "Blackgram",
+            "Greengram", "Jowar", "Bajra", "Wheat",
+            "Sugarcane", "Turmeric", "Chilli",
+            "Tomato", "Onion", "Brinjal", "Okra",
+            "Banana", "Mango", "Coconut"
         ]
     )
 

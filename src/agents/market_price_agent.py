@@ -4,7 +4,7 @@ import requests
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from rag.vectorstore import load_vectorstore
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,9 +12,9 @@ load_dotenv()
 class MarketPriceAgent:
     def __init__(self):
         self.vs = load_vectorstore()
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            google_api_key=os.getenv("GOOGLE_API_KEY")
+        self.llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            api_key=os.getenv("GROQ_API_KEY")
         )
         self.api_key = os.getenv("DATA_GOV_API_KEY")
 

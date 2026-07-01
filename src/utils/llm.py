@@ -1,12 +1,13 @@
-import google.generativeai as genai
 import os
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
 
-# Read API key from environment variable
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+load_dotenv()
 
-model = genai.GenerativeModel("gemini-2.5-flash")
-
-
-def get_llm_response(prompt):
-    response = model.generate_content(prompt)
-    return response.text
+def get_llm_response(prompt: str) -> str:
+    llm = ChatGroq(
+        model="llama-3.3-70b-versatile",
+        api_key=os.getenv("GROQ_API_KEY")
+    )
+    response = llm.invoke(prompt)
+    return response.content

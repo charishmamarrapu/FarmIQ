@@ -1,6 +1,9 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from rag.retriever import retrieve_context
 from utils.llm import get_llm_response
-
 
 class SchemeAgent:
     def __init__(self):
@@ -20,7 +23,7 @@ Which government schemes is this farmer eligible for?
         # Retrieve relevant context from the vector database
         context = retrieve_context(query)
 
-        # Create prompt for Gemini
+        # Create prompt for Groq
         prompt = f"""
 You are an expert in Indian agricultural government schemes.
 
@@ -45,7 +48,19 @@ Farmer Query:
 {query}
 """
 
-        # Get response from Gemini
+        # Get response from LLM
         response = get_llm_response(prompt)
 
         return response
+
+# Test it
+if __name__ == "__main__":
+    agent = SchemeAgent()
+    result = agent.ask(
+        land_size="2",
+        income="50000",
+        district="Guntur",
+        language="English"
+    )
+    print("\n🏛️ Scheme Advisory:")
+    print(result)

@@ -27,13 +27,14 @@ prices to give farmers real, actionable decisions.
 - Gurrala Sri Likhitha - Data Collection
 - V.S. Hasini Reddy - Testing & Integration
 
-## How to Run
+## How to Run Locally
 1. Clone the repo
 2. Create virtual environment: `python -m venv farmiq_env`
 3. Activate: `farmiq_env\Scripts\activate`
-4. Install packages: `pip install -r requirements.txt`
-5. Run pipeline: `python src/rag/build_pipeline.py`
-6. Test retrieval: `python src/rag/test_retrieval.py`
+4. Install: `pip install -r requirements.txt`
+5. Add API keys to `.env` file
+6. Run pipeline: `python src/rag/build_pipeline.py`
+7. Run app: `streamlit run src/ui/app.py`
 
 ## Data Sources
 See `docs/DATA_SOURCES.md` for full list

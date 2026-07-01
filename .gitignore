@@ -221,9 +221,6 @@ __marimo__/
 # *.pdf
 # *.csv
 
-# Vector store
-vectorstore/
-
 # Virtual environment
 farmiq_env/
 

@@ -67,7 +67,11 @@ class Orchestrator:
 
         else:
             print("→ Routing to Crop Advisory Agent 🌾")
-            return self.crop_agent.ask(query, language)
+            return self.crop_agent.ask(
+                query, 
+                language, 
+                district=kwargs.get("district", "Guntur")
+            )
 
 
 # Test all 5 agents

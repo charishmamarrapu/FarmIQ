@@ -39,9 +39,12 @@ real, actionable decisions.
 - Deployment: Streamlit Cloud
 
 ## 📁 Project Structure
+
+```
 FarmIQ/
-├── src/
-│   ├── agents/
+│
+├── 📁 src/
+│   ├── 📁 agents/
 │   │   ├── crop_advisory_agent.py
 │   │   ├── market_price_agent.py
 │   │   ├── weather_agent.py
@@ -49,26 +52,45 @@ FarmIQ/
 │   │   ├── scheme_agent.py
 │   │   ├── fertilizer_agent.py
 │   │   └── orchestrator.py
-│   ├── rag/
+│   │
+│   ├── 📁 rag/
 │   │   ├── build_pipeline.py
 │   │   ├── pdf_loader.py
 │   │   ├── csv_loader.py
 │   │   ├── vectorstore.py
 │   │   ├── retriever.py
 │   │   └── test_retrieval.py
-│   ├── utils/
+│   │
+│   ├── 📁 utils/
 │   │   └── llm.py
-│   └── ui/
+│   │
+│   └── 📁 ui/
 │       └── app.py
-├── data/
-│   ├── pdfs/
-│   └── csvs/
-├── docs/
+│
+├── 📁 data/
+│   ├── 📁 pdfs/
+│   │   ├── crop_guides/
+│   │   ├── pest_disease/
+│   │   ├── ap_telangana/
+│   │   └── schemes/
+│   └── 📁 csvs/
+│       └── data_gov_in/
+│
+├── 📁 docs/
 │   ├── DATA_SOURCES.md
+│   ├── ARCHITECTURE.md
 │   ├── TESTING_REPORT_WEEK1.md
 │   ├── TESTING_REPORT_WEEK2.md
 │   └── TESTING_REPORT_WEEK3.md
-└── vectorstore/
+│
+├── 📁 vectorstore/
+│   └── chroma.sqlite3
+│
+├── .env
+├── .gitignore
+├── README.md
+└── requirements.txt
+```
 
 ## 🚀 How to Run Locally
 1. Clone the repo

@@ -21,74 +21,134 @@ class Orchestrator:
         print("✅ All 6 agents ready!")
 
     def route(self, query: str, language: str = "English", **kwargs):
-        """Decides which agent to call based on query"""
-        query_lower = query.lower()
+        """Route query to correct agent using better intent detection"""
+        query_lower = query.lower().strip()
 
-        if any(word in query_lower for word in
-               ["scheme", "eligib", "pm-kisan", "pmfby",
-                "subsidy", "benefit", "government",
-                "insurance", "kisan"]):
-            print("→ Routing to Scheme Agent 🏛️")
-            return self.scheme_agent.ask(
-                kwargs.get("land_size", "2"),
-                kwargs.get("income", "50000"),
-                kwargs.get("district", "Guntur"),
-                language
-            )
+    # Score each agent based on keyword relevance
+        scores = {
+            "fertilizer": 0,
+            "scheme": 0,
+            "market": 0,
+            "weather": 0,
+            "pest": 0,
+            "crop": 0
+        }
 
-        elif any(word in query_lower for word in
-                 ["price", "sell", "mandi", "market",
-                  "rate", "cost", "buy"]):
-            print("→ Routing to Market Price Agent 💰")
-            return self.market_agent.ask(
-                kwargs.get("crop", "paddy"),
-                kwargs.get("district", "Guntur"),
-                language
-            )
+    # Fertilizer keywords
+        fertilizer_words = [
+            "fertilizer", "fertiliser", "npk", "nitrogen",
+            "phosphorus", "potassium", "manure", "urea",
+            "dap", "compost", "nutrient", "soil nutrient",
+            "top dress", "basal dose", "micronutrient"
+        ]
 
-        elif any(word in query_lower for word in
-                 ["weather", "rain", "flood", "drought",
-                  "temperature", "forecast", "climate"]):
-            print("→ Routing to Weather Agent 🌤️")
-            return self.weather_agent.ask(
-                kwargs.get("crop", "paddy"),
-                kwargs.get("district", "Guntur"),
-                language
-            )
+    # Scheme keywords
+        scheme_words = [
+            "scheme", "eligib", "pm-kisan", "pmfby",
+            "subsidy", "benefit", "government", "insurance",
+            "kisan", "yojana", "pension", "credit card",
+            "ration", "welfare", "assistance"
+        ]
 
-        elif any(word in query_lower for word in
-                 ["pest", "disease", "yellow", "spots",
-                  "wilt", "insect", "fungus", "symptom",
-                  "leaves", "curling", "damage"]):
-            print("→ Routing to Pest and Disease Agent 🐛")
-            return self.pest_agent.ask(
-                kwargs.get("crop", "paddy"),
-                kwargs.get("symptoms", query),
-                language
-            )
+    # Market keywords
+        market_words = [
+            "price", "sell", "mandi", "market", "rate",
+            "cost", "buy", "quintal", "per kg", "profit",
+            "sale", "trading", "wholesale", "retail"
+        ]
 
-        elif any(word in query_lower for word in
-                 ["fertilizer", "npk", "nitrogen", "phosphorus",
-                  "potassium", "manure", "urea", "dap"]):
-            print("→ Routing toFertilizer Agent 🌱")
-            return self.fertilizer_agent.ask(
-                kwargs.get("crop", "paddy"),
-                float(kwargs.get("land_size", "2")),
-                kwargs.get("soil_type", "Claay Loam"),
-                kwargs.get("district", "Guntur"),
-                language
-            )
+    # Weather keywords
+        weather_words = [
+            "weather", "rain", "flood", "drought",
+            "temperature", "forecast", "climate", "humid",
+            "wind", "storm", "irrigation", "season"
+        ]
 
-        else:
-            print("→ Routing to Crop Advisory Agent 🌾")
-            return self.crop_agent.ask(
-                query, 
-                language, 
-                district=kwargs.get("district", "Guntur")
-            )
+    # Pest keywords
+        pest_words = [
+            "pest", "disease", "yellow", "spots", "wilt",
+            "insect", "fungus", "symptom", "leaves", "curl",
+            "damage", "rot", "blight", "virus", "bacteria",
+            "infestation", "attack", "brown", "black spot"
+        ]
+
+    # Score each category
+    for word in fertilizer_words:
+        if word in query_lower:
+            scores["fertilizer"] += 2
+    for word in scheme_words:
+        if word in query_lower:
+            scores["scheme"] += 2
+    for word in market_words:
+        if word in query_lower:
+            scores["market"] += 2
+    for word in weather_words:
+        if word in query_lower:
+            scores["weather"] += 2
+    for word in pest_words:
+        if word in query_lower:
+            scores["pest"] += 2
+
+    # Default crop gets score 1 always
+    scores["crop"] = 1
+
+    # Find highest scoring agent
+    best_agent = max(scores, key=scores.get)
+
+    # Route to best agent
+    if best_agent == "fertilizer" and scores["fertilizer"] > 0:
+        print("→ Routing to Fertilizer Agent 🌱")
+        return self.fertilizer_agent.ask(
+            kwargs.get("crop", "paddy"),
+            float(kwargs.get("land_size", "2")),
+            kwargs.get("soil_type", "Clay Loam"),
+            kwargs.get("district", "Guntur"),
+            language
+        )
+
+    elif best_agent == "scheme" and scores["scheme"] > 0:
+        print("→ Routing to Scheme Agent 🏛️")
+        return self.scheme_agent.ask(
+            kwargs.get("land_size", "2"),
+            kwargs.get("income", "50000"),
+            kwargs.get("district", "Guntur"),
+            language
+        )
+
+    elif best_agent == "market" and scores["market"] > 0:
+        print("→ Routing to Market Price Agent 💰")
+        return self.market_agent.ask(
+            kwargs.get("crop", "paddy"),
+            kwargs.get("district", "Guntur"),
+            language
+        )
+
+    elif best_agent == "weather" and scores["weather"] > 0:
+        print("→ Routing to Weather Agent 🌤️")
+        return self.weather_agent.ask(
+            kwargs.get("crop", "paddy"),
+            kwargs.get("district", "Guntur"),
+            language
+        )
+
+    elif best_agent == "pest" and scores["pest"] > 0:
+        print("→ Routing to Pest and Disease Agent 🐛")
+        return self.pest_agent.ask(
+            kwargs.get("crop", "paddy"),
+            kwargs.get("symptoms", query),
+            language
+        )
+
+    else:
+        print("→ Routing to Crop Advisory Agent 🌾")
+        return self.crop_agent.ask(
+            query,
+            language,
+            district=kwargs.get("district", "Guntur")
+        )
 
 
-# Test all 5 agents
+# Test all 6 agents
 if __name__ == "__main__":
     orch = Orchestrator()
 

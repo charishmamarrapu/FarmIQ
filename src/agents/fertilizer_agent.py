@@ -49,6 +49,9 @@ Provide a DETAILED fertilizer plan including:
 Answer in {language} in simple language a farmer can understand.
 Give specific quantities in kg per acre.
 Do NOT ask for more information — give best recommendations from context.
+IMPORTANT: Answer in {language} language ONLY. 
+If language is Telugu, write the COMPLETE answer 
+in Telugu script. Do not mix English and Telugu.
 """
         response = self.llm.invoke(prompt)
         return response.content

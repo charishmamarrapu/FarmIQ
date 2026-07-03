@@ -47,6 +47,9 @@ Important instructions:
 - Do NOT ask for more information
 - Answer directly and confidently in {language}
 - Keep answer clear and easy to understand
+IMPORTANT: Answer in {language} language ONLY. 
+If language is Telugu, write the COMPLETE answer 
+in Telugu script. Do not mix English and Telugu.
 """
         # Step 3 - Get answer from Groq
         response = self.llm.invoke(prompt)

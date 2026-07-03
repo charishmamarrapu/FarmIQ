@@ -228,8 +228,8 @@ with tab3:
 with tab4:
     st.header("🐛 Pest & Disease Identifier")
     st.markdown(
-        "Describe your crop symptoms and get "
-        "pest or disease identification with "
+        "Describe symptoms or upload a photo of "
+        "your affected crop to get diagnosis and "
         "treatment advice."
     )
 
@@ -241,37 +241,122 @@ with tab4:
             "Greengram", "Jowar", "Bajra", "Wheat",
             "Sugarcane", "Turmeric", "Chilli",
             "Tomato", "Onion", "Brinjal", "Okra",
-            "Banana", "Mango", "Coconut"
+            "Banana", "Mango", "Coconut",
+            "Soybean", "Sesame", "Castor", "Ragi"
         ]
     )
 
-    symptoms = st.text_area(
-        "Describe the symptoms you see:",
-        placeholder="Example: Leaves are turning "
-                    "yellow and curling at the edges",
-        height=100
+    # Input method selection
+    input_method = st.radio(
+        "How would you like to describe the problem?",
+        ["📝 Describe Symptoms", "📷 Upload Photo"]
     )
 
-    if st.button("Identify Pest/Disease 🐛", key="pest_btn"):
-        if symptoms:
-            with st.spinner(
-                "Analyzing symptoms from pest "
-                "management documents..."
+    if input_method == "📝 Describe Symptoms":
+        symptoms = st.text_area(
+            "Describe the symptoms you see:",
+            placeholder="Example: Leaves are turning "
+                        "yellow and curling at the edges",
+            height=100
+        )
+
+        if st.button("Identify Pest/Disease 🐛",
+                     key="pest_btn"):
+            if symptoms:
+                with st.spinner(
+                    "Analyzing symptoms from pest "
+                    "management documents..."
+                ):
+                    try:
+                        orch = load_orchestrator()
+                        answer = orch.route(
+                            f"pest disease symptoms {symptoms}",
+                            language=language,
+                            crop=pest_crop,
+                            symptoms=symptoms
+                        )
+                        st.success(
+                            "✅ Pest/Disease Analysis Ready!"
+                        )
+                        st.markdown(answer)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+            else:
+                st.warning(
+                    "Please describe the symptoms first!"
+                )
+
+    else:  # Upload Photo
+        uploaded_image = st.file_uploader(
+            "Upload a photo of your affected crop",
+            type=["jpg", "jpeg", "png"],
+            help="Upload a clear photo showing "
+                 "the affected leaves, stems or fruits"
+        )
+
+        if uploaded_image is not None:
+            # Show uploaded image
+            from PIL import Image
+            image = Image.open(uploaded_image)
+            image_resized = image.resize((400, 300))
+            st.image(
+                image_resized,
+                caption="Uploaded crop photo",
+                width=400
+            )
+
+            # Ask farmer to describe what they see
+            st.markdown("**What do you see in the photo?**")
+            col1, col2 = st.columns(2)
+
+            with col1:
+                color_change = st.multiselect(
+                    "Color changes on leaves/stems:",
+                    ["Yellow leaves", "Brown spots",
+                     "Black spots", "White patches",
+                     "Purple discoloration", "Wilting",
+                     "Curling leaves", "Dried leaves"]
+                )
+
+            with col2:
+                other_symptoms = st.multiselect(
+                    "Other symptoms visible:",
+                    ["Holes in leaves", "Sticky substance",
+                     "Insects visible", "Web on plants",
+                     "Rotting stems", "Stunted growth",
+                     "Falling leaves", "Damaged fruits"]
+                )
+
+            if st.button(
+                "Analyze Photo 📷",
+                key="photo_btn"
             ):
-                try:
-                    orch = load_orchestrator()
-                    answer = orch.route(
-                        f"pest disease symptoms {symptoms}",
-                        language=language,
-                        crop=pest_crop,
-                        symptoms=symptoms
-                    )
-                    st.success("✅ Pest/Disease Analysis Ready!")
-                    st.markdown(answer)
-                except Exception as e:
-                    st.error(f"Error: {e}")
-        else:
-            st.warning("Please describe the symptoms first!")
+                with st.spinner(
+                    "Analyzing your crop photo..."
+                ):
+                    try:
+                        # Combine visual observations
+                        image_description = (
+                            f"Color changes: "
+                            f"{', '.join(color_change) if color_change else 'None'}. "
+                            f"Other symptoms: "
+                            f"{', '.join(other_symptoms) if other_symptoms else 'None'}"
+                        )
+
+                        # Use pest agent directly
+                        from agents.pest_disease_agent import PestDiseaseAgent
+                        agent = PestDiseaseAgent()
+                        answer = agent.analyze_image(
+                            pest_crop,
+                            image_description,
+                            language
+                        )
+
+                        st.success("✅ Photo Analysis Ready!")
+                        st.markdown(answer)
+
+                    except Exception as e:
+                        st.error(f"Error: {e}")
 
 # ── TAB 5: Government Schemes ────────────────────────
 with tab5:

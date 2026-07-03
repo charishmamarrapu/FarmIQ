@@ -49,7 +49,7 @@ Farmer Query:
 """
 
         # Get response from LLM
-        response = get_llm_response(prompt)
+        response = get_llm_response(prompt, language)
 
         return response
 

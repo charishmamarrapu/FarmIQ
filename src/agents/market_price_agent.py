@@ -63,6 +63,9 @@ Give current price information and a clear
 sell or hold recommendation.
 Answer in {language} in simple language
 a farmer can understand.
+IMPORTANT: Answer in {language} language ONLY. 
+If language is Telugu, write the COMPLETE answer 
+in Telugu script. Do not mix English and Telugu.
 """
         # Step 4 - Get answer from Gemini
         response = self.llm.invoke(prompt)

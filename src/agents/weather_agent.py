@@ -69,6 +69,9 @@ The farmer is growing {crop} in {district}.
 Analyze the weather forecast and warn about any risks.
 Give specific advice on what the farmer should do.
 Answer in {language} in simple language a farmer can understand.
+IMPORTANT: Answer in {language} language ONLY. 
+If language is Telugu, write the COMPLETE answer 
+in Telugu script. Do not mix English and Telugu.
 """
         # Step 4 - Get answer from Gemini
         response = self.llm.invoke(prompt)

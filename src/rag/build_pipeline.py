@@ -7,15 +7,18 @@ from pdf_loader import load_pdfs, chunk_documents
 from csv_loader import load_crop_production_csv, load_mandi_prices_csv
 from vectorstore import build_vectorstore
 
+# Project root: FarmIQ/
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 def build_full_pipeline():
     all_chunks = []
 
     pdf_folders = [
-        "data/pdfs/crop_guides",
-        "data/pdfs/pest_disease",
-        "data/pdfs/ap_telangana",
-        "data/pdfs/schemes",
+        os.path.join(PROJECT_ROOT, "data", "pdfs", "crop_guides"),
+        os.path.join(PROJECT_ROOT, "data", "pdfs", "pest_disease"),
+        os.path.join(PROJECT_ROOT, "data", "pdfs", "ap_telangana"),
+        os.path.join(PROJECT_ROOT, "data", "pdfs", "schemes"),
     ]
 
     for folder in pdf_folders:
@@ -26,8 +29,8 @@ def build_full_pipeline():
         else:
             print(f"⚠️ Skipping empty folder: {folder}")
 
-    crop_csv = "data/csvs/data_gov_in/crop_production.csv"
-    mandi_csv = "data/csvs/data_gov_in/mandi_prices.csv"
+    crop_csv = os.path.join(PROJECT_ROOT, "data", "csvs", "data_gov_in", "crop_production.csv")
+    mandi_csv = os.path.join(PROJECT_ROOT, "data", "csvs", "data_gov_in", "mandi_prices.csv")
 
     if os.path.exists(crop_csv):
         all_chunks.extend(load_crop_production_csv(crop_csv))

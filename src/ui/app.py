@@ -25,12 +25,6 @@ st.set_page_config(
     layout="wide"
 )
 
-
-# ── Load Orchestrator Once ───────────────────────────────────────
-@st.cache_resource
-def load_orchestrator():
-    return Orchestrator()
-
 # ── Sidebar ──────────────────────────────────────────────────────
 st.sidebar.title("🌾 FarmIQ")
 st.sidebar.markdown("Multi-Agent Agricultural Advisory System")
@@ -130,7 +124,7 @@ with tab1:
         if crop_question.strip():
             with st.spinner("Getting advice from agricultural documents..."):
                 try:
-                    orch = load_orchestrator()
+                    orch = Orchestrator()
                     answer = orch.route(
                         crop_question,
                         language=language,
@@ -160,7 +154,7 @@ with tab2:
     if st.button("Check Market Price 💰", key="market_btn"):
         with st.spinner("Fetching market price data..."):
             try:
-                orch = load_orchestrator()
+                orch = Orchestrator()
                 answer = orch.route(
                     f"What is the current price of {crop_name}?",
                     language=language,
@@ -208,7 +202,7 @@ with tab3:
     if st.button("Get Weather Alert 🌤️", key="weather_btn"):
         with st.spinner("Fetching live weather forecast..."):
             try:
-                orch = load_orchestrator()
+                orch = Orchestrator()
                 answer = orch.route(
                     "What is the weather forecast and impact on my crop?",
                     language=language,
@@ -252,7 +246,7 @@ with tab4:
             if symptoms.strip():
                 with st.spinner("Analyzing symptoms from pest management documents..."):
                     try:
-                        orch = load_orchestrator()
+                        orch = Orchestrator()
                         answer = orch.route(
                             f"pest disease symptoms {symptoms}",
                             language=language,
@@ -369,7 +363,7 @@ with tab5:
     if st.button("Check Scheme Eligibility 🏛️", key="scheme_btn"):
         with st.spinner("Checking government schemes..."):
             try:
-                orch = load_orchestrator()
+                orch = Orchestrator()
                 answer = orch.route(
                     "government scheme eligibility",
                     language=language,
@@ -448,7 +442,7 @@ with tab6:
     if st.button("Calculate Fertilizer 🌱", key="fert_btn"):
         with st.spinner("Calculating optimal fertilizer plan..."):
             try:
-                orch = load_orchestrator()
+                orch = Orchestrator()
                 answer = orch.route(
                     "fertilizer recommendation",
                     language=language,

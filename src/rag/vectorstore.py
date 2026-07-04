@@ -4,11 +4,11 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 EMBED_MODEL = "all-MiniLM-L6-v2"
 
-# FarmIQ project root
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Project root: FarmIQ/
+# current file = src/rag/vectorstore.py
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Absolute vectorstore path
-VECTORSTORE_DIR = os.path.join(BASE_DIR, "vectorstore")
+VECTORSTORE_DIR = os.path.join(PROJECT_ROOT, "vectorstore")
 
 
 def get_embeddings():
@@ -26,20 +26,15 @@ def build_vectorstore(chunks, persist_path=VECTORSTORE_DIR):
         embedding=embeddings,
         persist_directory=persist_path
     )
-
     vectorstore.persist()
     print(f"✅ Vector store saved to {persist_path}")
     return vectorstore
 
 
 def vectorstore_exists(persist_path=VECTORSTORE_DIR):
-    """
-    Check whether a usable Chroma vectorstore already exists.
-    """
     if not os.path.exists(persist_path):
         return False
 
-    # Chroma usually creates files like chroma.sqlite3 and index folders
     contents = os.listdir(persist_path)
     return len(contents) > 0
 

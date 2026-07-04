@@ -230,5 +230,3 @@ farmiq_env/
 # Python cache
 __pycache__/
 *.pyc
-
-vectorstore/

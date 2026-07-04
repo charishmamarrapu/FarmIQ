@@ -232,5 +232,3 @@ __pycache__/
 *.pyc
 
 vectorstore/
-data/pdfs/
-data/csvs/

@@ -1,7 +1,18 @@
-from rag.vectorstore import load_vectorstore
+from rag.vectorstore import load_vectorstore, vectorstore_exists
+from rag.build_pipeline import build_full_pipeline  
 
-# Load the vector database only once
-db = load_vectorstore()
+
+def get_db():
+    """
+    Load the vector DB if it exists.
+    If missing, build it automatically from source documents.
+    """
+    if vectorstore_exists():
+        print("✅ Existing vector store found. Loading it...")
+        return load_vectorstore()
+
+    print("⚠️ Vector store not found. Building it now...")
+    return build_full_pipeline()
 
 
 def retrieve_context(query, k=8):
@@ -15,8 +26,8 @@ def retrieve_context(query, k=8):
     Returns:
         str: Combined context from retrieved documents.
     """
+    db = get_db()
 
-    # Use Max Marginal Relevance to avoid duplicate chunks
     docs = db.max_marginal_relevance_search(
         query=query,
         k=k,

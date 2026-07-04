@@ -1,9 +1,11 @@
 import os
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from rag.retriever import retrieve_context
 from utils.llm import get_llm_response
+
 
 class SchemeAgent:
     def __init__(self):
@@ -17,7 +19,7 @@ Annual Income: ₹{income}
 District: {district}
 Language: {language}
 
-Which government schemes is this farmer eligible for?
+Which government schemes is this farmer eligible for based on the given details?
 """
 
         # Retrieve relevant context from the vector database
@@ -27,9 +29,9 @@ Which government schemes is this farmer eligible for?
         prompt = f"""
 You are an expert in Indian agricultural government schemes.
 
-Using ONLY the information provided in the context below, answer the farmer's question.
+Use ONLY the information provided in the context below to answer the farmer's question.
 
-Provide your answer in the following format:
+Provide the answer in the following format:
 
 1. Scheme Name
 2. Benefits
@@ -53,12 +55,13 @@ Farmer Query:
 
         return response
 
+
 # Test it
 if __name__ == "__main__":
     agent = SchemeAgent()
     result = agent.ask(
-        land_size="2",
-        income="50000",
+        land_size=2,
+        income=50000,
         district="Guntur",
         language="English"
     )

@@ -1,30 +1,37 @@
 import sys
 import os
+import tempfile
+from PIL import Image
+import pandas as pd
+import streamlit as st
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
 from agents.orchestrator import Orchestrator
 
-# ── Load API Keys from Streamlit Secrets ────────────
+
+# ── Load API Keys from Streamlit Secrets ─────────────────────────
 try:
     os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
     os.environ["OPENWEATHER_API_KEY"] = st.secrets["OPENWEATHER_API_KEY"]
-except:
+except Exception:
     pass  # Falls back to .env file locally
 
-# ── Page Configuration ──────────────────────────────
+
+# ── Page Configuration ───────────────────────────────────────────
 st.set_page_config(
     page_title="FarmIQ - Agricultural Advisory",
     page_icon="🌾",
     layout="wide"
 )
 
-# ── Load Orchestrator Once ───────────────────────────
+
+# ── Load Orchestrator Once ───────────────────────────────────────
 @st.cache_resource
 def load_orchestrator():
     return Orchestrator()
 
-# ── Sidebar ──────────────────────────────────────────
+# ── Sidebar ──────────────────────────────────────────────────────
 st.sidebar.title("🌾 FarmIQ")
 st.sidebar.markdown("Multi-Agent Agricultural Advisory System")
 st.sidebar.markdown("---")
@@ -48,6 +55,7 @@ district = st.sidebar.selectbox(
         "Alluri Sitharama Raju", "Anakapalli",
         "Kakinada", "Konaseema",
         "Sri Sathya Sai", "Tirupati",
+
         # Telangana Districts
         "Warangal", "Karimnagar", "Khammam",
         "Nizamabad", "Hyderabad", "Medchal",
@@ -69,15 +77,16 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("**Team 5 — FarmIQ**")
 st.sidebar.markdown("Charishma | Likhitha | Hasini")
 
-# ── Main Title ───────────────────────────────────────
+
+# ── Main Title ───────────────────────────────────────────────────
 st.title("🌾 FarmIQ — Agricultural Advisory System")
 st.markdown(
-    "AI-powered advice for farmers in "
-    "Andhra Pradesh and Telangana"
+    "AI-powered advice for farmers in Andhra Pradesh and Telangana"
 )
 st.markdown("---")
 
-# ── Tabs ─────────────────────────────────────────────
+
+# ── Tabs ─────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "🌾 Crop Advisory",
     "💰 Market Price",
@@ -87,26 +96,39 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "🌱 Fertilizer Calc"
 ])
 
-# ── TAB 1: Crop Advisory ─────────────────────────────
+
+# ── Common crop list ─────────────────────────────────────────────
+COMMON_CROPS = [
+    "Paddy", "Cotton", "Maize", "Groundnut",
+    "Sunflower", "Redgram", "Blackgram",
+    "Greengram", "Jowar", "Bajra", "Wheat",
+    "Sugarcane", "Turmeric", "Chilli",
+    "Tomato", "Onion", "Brinjal", "Okra",
+    "Banana", "Mango", "Coconut",
+    "Soybean", "Sesame", "Castor",
+    "Pearl Millet", "Finger Millet",
+    "Black Pepper", "Cashew", "Coffee",
+    "Cardamom", "Areca Nut", "Ragi"
+]
+
+
+# ── TAB 1: Crop Advisory ─────────────────────────────────────────
 with tab1:
     st.header("🌾 Crop Advisory")
     st.markdown(
-        "Get expert advice on crops, fertilizers, "
-        "irrigation and cultivation practices."
+        "Get expert advice on crops, fertilizers, irrigation, "
+        "cultivation practices, and seasonal planning."
     )
 
     crop_question = st.text_area(
         "Ask your crop question:",
-        placeholder="Example: What is the best crop "
-                    "to grow in Kharif season?",
+        placeholder="Example: What is the best crop to grow in Kharif season?",
         height=100
     )
 
     if st.button("Get Crop Advice 🌾", key="crop_btn"):
-        if crop_question:
-            with st.spinner(
-                "Getting advice from agricultural documents..."
-            ):
+        if crop_question.strip():
+            with st.spinner("Getting advice from agricultural documents..."):
                 try:
                     orch = load_orchestrator()
                     answer = orch.route(
@@ -121,28 +143,18 @@ with tab1:
         else:
             st.warning("Please type your question first!")
 
-# ── TAB 2: Market Price ──────────────────────────────
+
+# ── TAB 2: Market Price ──────────────────────────────────────────
 with tab2:
     st.header("💰 Market Price Advisory")
     st.markdown(
-        "Check current mandi prices and get "
-        "sell or hold recommendations."
+        "Check current mandi prices and get sell/hold recommendations."
     )
 
     crop_name = st.selectbox(
         "Select Your Crop",
-        [
-            "Paddy", "Cotton", "Maize", "Groundnut",
-            "Sunflower", "Redgram", "Blackgram",
-            "Greengram", "Jowar", "Bajra", "Wheat",
-            "Sugarcane", "Turmeric", "Chilli",
-            "Tomato", "Onion", "Brinjal", "Okra",
-            "Banana", "Mango", "Coconut",
-            "Soybean", "Sesame", "Castor",
-            "Pearl Millet", "Finger Millet",
-            "Black Pepper", "Cashew", "Coffee",
-            "Cardamom", "Areca Nut"
-        ]
+        COMMON_CROPS,
+        key="market_crop"
     )
 
     if st.button("Check Market Price 💰", key="market_btn"):
@@ -158,54 +170,39 @@ with tab2:
                 st.success("✅ Price Advisory Ready!")
                 st.markdown(answer)
 
-                # Price Chart
+                # Placeholder historical price chart
                 st.subheader("📊 Historical Price Trend")
-                import pandas as pd
                 price_data = pd.DataFrame({
                     "Month": [
-                        "Jan", "Feb", "Mar", "Apr",
-                        "May", "Jun", "Jul", "Aug",
-                        "Sep", "Oct", "Nov", "Dec"
+                        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
                     ],
                     "Price (₹/Quintal)": [
-                        1800, 1850, 1900, 1780,
-                        1820, 1950, 2000, 1980,
-                        1870, 1760, 1800, 1900
+                        1800, 1850, 1900, 1780, 1820, 1950,
+                        2000, 1980, 1870, 1760, 1800, 1900
                     ]
                 })
-                st.line_chart(
-                    price_data.set_index("Month")
-                )
+                st.line_chart(price_data.set_index("Month"))
                 st.caption(
-                    "Note: Chart shows indicative historical "
-                    "price trend. Actual prices vary by market."
+                    "Note: Chart shows indicative historical price trend. "
+                    "Actual prices vary by mandi and date."
                 )
 
             except Exception as e:
                 st.error(f"Error: {e}")
 
-# ── TAB 3: Weather Alert ─────────────────────────────
+
+# ── TAB 3: Weather Alert ─────────────────────────────────────────
 with tab3:
     st.header("🌤️ Weather Alert")
     st.markdown(
-        "Get weather forecast and crop protection "
-        "advice for your district."
+        "Get weather forecast and crop protection advice for your district."
     )
 
     weather_crop = st.selectbox(
         "Select Your Crop for Weather Advisory",
-        [
-            "Paddy", "Cotton", "Maize", "Groundnut",
-            "Sunflower", "Redgram", "Blackgram",
-            "Greengram", "Jowar", "Bajra", "Wheat",
-            "Sugarcane", "Turmeric", "Chilli",
-            "Tomato", "Onion", "Brinjal", "Okra",
-            "Banana", "Mango", "Coconut",
-            "Soybean", "Sesame", "Castor",
-            "Pearl Millet", "Finger Millet",
-            "Black Pepper", "Cashew", "Coffee",
-            "Cardamom", "Areca Nut"
-        ]
+        COMMON_CROPS,
+        key="weather_crop"
     )
 
     if st.button("Get Weather Alert 🌤️", key="weather_btn"):
@@ -213,8 +210,7 @@ with tab3:
             try:
                 orch = load_orchestrator()
                 answer = orch.route(
-                    "What is the weather forecast "
-                    "and impact on my crop?",
+                    "What is the weather forecast and impact on my crop?",
                     language=language,
                     crop=weather_crop,
                     district=district
@@ -224,49 +220,37 @@ with tab3:
             except Exception as e:
                 st.error(f"Error: {e}")
 
-# ── TAB 4: Pest & Disease ────────────────────────────
+
+# ── TAB 4: Pest & Disease ────────────────────────────────────────
 with tab4:
     st.header("🐛 Pest & Disease Identifier")
     st.markdown(
-        "Describe symptoms or upload a photo of "
-        "your affected crop to get diagnosis and "
-        "treatment advice."
+        "Describe symptoms or upload a crop photo to get diagnosis and treatment advice."
     )
 
     pest_crop = st.selectbox(
         "Select Affected Crop",
-        [
-            "Paddy", "Cotton", "Maize", "Groundnut",
-            "Sunflower", "Redgram", "Blackgram",
-            "Greengram", "Jowar", "Bajra", "Wheat",
-            "Sugarcane", "Turmeric", "Chilli",
-            "Tomato", "Onion", "Brinjal", "Okra",
-            "Banana", "Mango", "Coconut",
-            "Soybean", "Sesame", "Castor", "Ragi"
-        ]
+        COMMON_CROPS,
+        key="pest_crop"
     )
 
-    # Input method selection
     input_method = st.radio(
-        "How would you like to describe the problem?",
-        ["📝 Describe Symptoms", "📷 Upload Photo"]
+        "Choose Input Method",
+        ["📝 Describe Symptoms", "📷 Upload Photo"],
+        horizontal=True
     )
 
+    # ── Option 1: Text symptoms ──────────────────────────────────
     if input_method == "📝 Describe Symptoms":
         symptoms = st.text_area(
             "Describe the symptoms you see:",
-            placeholder="Example: Leaves are turning "
-                        "yellow and curling at the edges",
+            placeholder="Example: Leaves are turning yellow and curling at the edges.",
             height=100
         )
 
-        if st.button("Identify Pest/Disease 🐛",
-                     key="pest_btn"):
-            if symptoms:
-                with st.spinner(
-                    "Analyzing symptoms from pest "
-                    "management documents..."
-                ):
+        if st.button("Identify Pest / Disease 🐛", key="pest_btn"):
+            if symptoms.strip():
+                with st.spinner("Analyzing symptoms from pest management documents..."):
                     try:
                         orch = load_orchestrator()
                         answer = orch.route(
@@ -275,95 +259,91 @@ with tab4:
                             crop=pest_crop,
                             symptoms=symptoms
                         )
-                        st.success(
-                            "✅ Pest/Disease Analysis Ready!"
-                        )
+                        st.success("✅ Pest/Disease Analysis Ready!")
                         st.markdown(answer)
                     except Exception as e:
                         st.error(f"Error: {e}")
             else:
-                st.warning(
-                    "Please describe the symptoms first!"
-                )
+                st.warning("Please describe the symptoms first!")
 
-    else:  # Upload Photo
+    # ── Option 2: Image upload ───────────────────────────────────
+    else:
         uploaded_image = st.file_uploader(
-            "Upload a photo of your affected crop",
+            "Upload a photo of the affected crop",
             type=["jpg", "jpeg", "png"],
-            help="Upload a clear photo showing "
-                 "the affected leaves, stems or fruits"
+            help="Upload a clear photo showing affected leaves, stems, or fruits.",
+            key="pest_photo"
         )
 
         if uploaded_image is not None:
-            # Show uploaded image
-            from PIL import Image
             image = Image.open(uploaded_image)
-            image_resized = image.resize((400, 300))
-            st.image(
-                image_resized,
-                caption="Uploaded crop photo",
-                width=400
-            )
+            st.image(image, caption="Uploaded Crop Photo", use_container_width=True)
 
-            # Ask farmer to describe what they see
-            st.markdown("**What do you see in the photo?**")
+            st.markdown("### Optional: add visible symptoms for better accuracy")
             col1, col2 = st.columns(2)
 
             with col1:
                 color_change = st.multiselect(
                     "Color changes on leaves/stems:",
-                    ["Yellow leaves", "Brown spots",
-                     "Black spots", "White patches",
-                     "Purple discoloration", "Wilting",
-                     "Curling leaves", "Dried leaves"]
+                    [
+                        "Yellow leaves", "Brown spots", "Black spots",
+                        "White patches", "Purple discoloration",
+                        "Wilting", "Curling leaves", "Dried leaves"
+                    ],
+                    key="color_change"
                 )
 
             with col2:
                 other_symptoms = st.multiselect(
-                    "Other symptoms visible:",
-                    ["Holes in leaves", "Sticky substance",
-                     "Insects visible", "Web on plants",
-                     "Rotting stems", "Stunted growth",
-                     "Falling leaves", "Damaged fruits"]
+                    "Other visible symptoms:",
+                    [
+                        "Holes in leaves", "Sticky substance", "Insects visible",
+                        "Web on plants", "Rotting stems", "Stunted growth",
+                        "Falling leaves", "Damaged fruits"
+                    ],
+                    key="other_symptoms"
                 )
 
-            if st.button(
-                "Analyze Photo 📷",
-                key="photo_btn"
-            ):
-                with st.spinner(
-                    "Analyzing your crop photo..."
-                ):
-                    try:
-                        # Combine visual observations
-                        image_description = (
-                            f"Color changes: "
-                            f"{', '.join(color_change) if color_change else 'None'}. "
-                            f"Other symptoms: "
-                            f"{', '.join(other_symptoms) if other_symptoms else 'None'}"
-                        )
+            if st.button("Analyze Photo 📷", key="photo_btn"):
+                try:
+                    extra_symptoms = []
+                    
+                    if color_change:
+                        extra_symptoms.append("Color changes: " + ", ".join(color_change))
 
-                        # Use pest agent directly
+                    if other_symptoms:
+                        extra_symptoms.append("Other symptoms: " + ", ".join(other_symptoms))
+
+                    symptom_description = "\n".join(extra_symptoms).strip()
+
+                    if not symptom_description:
+                        st.warning("Please select at least one visible symptom from the image.")
+                    else:
                         from agents.pest_disease_agent import PestDiseaseAgent
-                        agent = PestDiseaseAgent()
-                        answer = agent.analyze_image(
-                            pest_crop,
-                            image_description,
-                            language
-                        )
 
-                        st.success("✅ Photo Analysis Ready!")
+                        with st.spinner("Analyzing selected crop symptoms..."):
+                            agent = PestDiseaseAgent()
+                            answer = agent.ask(
+                                crop=pest_crop,
+                                symptoms=symptom_description,
+                                language=language
+                            )
+
+                        st.success("✅ Photo-based Pest/Disease Advisory Ready!")
+                        st.markdown("## 📝 Selected Symptoms")
+                        st.write(symptom_description)
+
+                        st.markdown("## 🌱 Advisory")
                         st.markdown(answer)
 
-                    except Exception as e:
-                        st.error(f"Error: {e}")
+                except Exception as e:
+                    st.error(f"Error while analyzing symptoms: {e}")
 
-# ── TAB 5: Government Schemes ────────────────────────
+# ── TAB 5: Government Schemes ────────────────────────────────────
 with tab5:
     st.header("🏛️ Government Scheme Finder")
     st.markdown(
-        "Find out which government schemes "
-        "you are eligible for based on your details."
+        "Find government schemes you may be eligible for based on your farm details."
     )
 
     col1, col2 = st.columns(2)
@@ -386,10 +366,7 @@ with tab5:
             step=5000
         )
 
-    if st.button(
-        "Check Scheme Eligibility 🏛️",
-        key="scheme_btn"
-    ):
+    if st.button("Check Scheme Eligibility 🏛️", key="scheme_btn"):
         with st.spinner("Checking government schemes..."):
             try:
                 orch = load_orchestrator()
@@ -397,47 +374,44 @@ with tab5:
                     "government scheme eligibility",
                     language=language,
                     district=district,
-                    land_size=str(land_size),
-                    income=str(income)
+                    land_size=land_size,
+                    income=income
                 )
                 st.success("✅ Scheme Information Ready!")
                 st.markdown(answer)
 
-                # Scheme Cards
                 st.subheader("📋 Major Schemes to Check")
                 col1, col2 = st.columns(2)
+
                 with col1:
                     st.info(
                         "**PM-KISAN**\n\n"
-                        "Rs 6,000 per year income "
-                        "support for all landholding farmers"
+                        "₹6,000 per year income support for eligible landholding farmers."
                     )
                     st.info(
                         "**PMFBY**\n\n"
-                        "Crop insurance against natural "
-                        "calamities, pests and diseases"
+                        "Crop insurance against natural calamities, pests, and diseases."
                     )
+
                 with col2:
                     st.info(
                         "**PM Kisan Maan Dhan Yojana**\n\n"
-                        "Rs 3,000 monthly pension for "
-                        "small and marginal farmers"
+                        "₹3,000 monthly pension for eligible small and marginal farmers."
                     )
                     st.info(
                         "**Kisan Credit Card**\n\n"
-                        "Easy credit access for crop "
-                        "production and allied activities"
+                        "Easy credit access for crop production and allied activities."
                     )
 
             except Exception as e:
                 st.error(f"Error: {e}")
 
-# ── TAB 6: Fertilizer Calculator ─────────────────────
+
+# ── TAB 6: Fertilizer Calculator ─────────────────────────────────
 with tab6:
     st.header("🌱 Fertilizer Calculator")
     st.markdown(
-        "Calculate the optimal fertilizer quantity "
-        "and cost for your crop and land size."
+        "Calculate the optimal fertilizer quantity and cost for your crop and land size."
     )
 
     col1, col2 = st.columns(2)
@@ -445,15 +419,7 @@ with tab6:
     with col1:
         fert_crop = st.selectbox(
             "Select Your Crop",
-            [
-                "Paddy", "Cotton", "Maize", "Groundnut",
-                "Sunflower", "Redgram", "Blackgram",
-                "Greengram", "Jowar", "Bajra", "Wheat",
-                "Sugarcane", "Turmeric", "Chilli",
-                "Tomato", "Onion", "Brinjal", "Okra",
-                "Banana", "Mango", "Coconut",
-                "Soybean", "Sesame", "Castor", "Ragi"
-            ],
+            COMMON_CROPS,
             key="fert_crop"
         )
         fert_land = st.number_input(
@@ -472,53 +438,50 @@ with tab6:
                 "Clay Loam", "Sandy Loam", "Black Cotton Soil",
                 "Red Soil", "Alluvial Soil", "Loamy Sand",
                 "Silty Clay", "Sandy Clay Loam"
-            ]
+            ],
+            key="soil_type"
         )
         st.info(
-            "💡 **Tip:** Select the correct soil type "
-            "for accurate fertilizer recommendations"
+            "💡 Tip: Select the correct soil type for more accurate fertilizer recommendations."
         )
 
-    if st.button(
-        "Calculate Fertilizer 🌱",
-        key="fert_btn"
-    ):
-        with st.spinner(
-            "Calculating optimal fertilizer plan..."
-        ):
+    if st.button("Calculate Fertilizer 🌱", key="fert_btn"):
+        with st.spinner("Calculating optimal fertilizer plan..."):
             try:
                 orch = load_orchestrator()
                 answer = orch.route(
                     "fertilizer recommendation",
                     language=language,
                     crop=fert_crop,
-                    land_size=str(fert_land),
+                    land_size=fert_land,
                     soil_type=soil_type,
                     district=district
                 )
                 st.success("✅ Fertilizer Plan Ready!")
                 st.markdown(answer)
 
-                # Summary cards
                 st.subheader("📊 Key Nutrients for Plants")
                 col1, col2, col3 = st.columns(3)
+
                 with col1:
                     st.info(
                         "**Nitrogen (N)**\n\n"
-                        "Promotes leaf and stem growth. "
-                        "Source: Urea, DAP"
+                        "Promotes leaf and stem growth.\n\n"
+                        "Common sources: Urea, DAP"
                     )
+
                 with col2:
                     st.info(
                         "**Phosphorus (P)**\n\n"
-                        "Promotes root growth. "
-                        "Source: SSP, DAP"
+                        "Promotes root growth and early crop establishment.\n\n"
+                        "Common sources: SSP, DAP"
                     )
+
                 with col3:
                     st.info(
                         "**Potassium (K)**\n\n"
-                        "Promotes fruit quality. "
-                        "Source: MOP, SOP"
+                        "Improves plant strength, fruit quality, and stress tolerance.\n\n"
+                        "Common sources: MOP, SOP"
                     )
 
             except Exception as e:

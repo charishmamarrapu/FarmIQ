@@ -271,7 +271,7 @@ with tab4:
 
         if uploaded_image is not None:
             image = Image.open(uploaded_image)
-            st.image(image, caption="Uploaded Crop Photo", use_container_width=True)
+            st.image(image, caption="Uploaded Crop Photo", width="stretch")
 
             st.markdown("### Optional: add visible symptoms for better accuracy")
             col1, col2 = st.columns(2)

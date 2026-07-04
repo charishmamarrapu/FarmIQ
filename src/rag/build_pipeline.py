@@ -7,7 +7,6 @@ from pdf_loader import load_pdfs, chunk_documents
 from csv_loader import load_crop_production_csv, load_mandi_prices_csv
 from vectorstore import build_vectorstore
 
-# Project root: FarmIQ/
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -17,14 +16,21 @@ def build_full_pipeline():
     pdf_folders = [
         os.path.join(PROJECT_ROOT, "data", "pdfs", "crop_guides"),
         os.path.join(PROJECT_ROOT, "data", "pdfs", "pest_disease"),
-        os.path.join(PROJECT_ROOT, "data", "pdfs", "ap_telangana"),
+        #os.path.join(PROJECT_ROOT, "data", "pdfs", "ap_telangana"),
         os.path.join(PROJECT_ROOT, "data", "pdfs", "schemes"),
     ]
 
     for folder in pdf_folders:
+        print(f"\n📂 Processing folder: {folder}")
+
         if os.path.exists(folder) and os.listdir(folder):
+            print(f"🔹 Loading PDFs from {folder} ...")
             docs = load_pdfs(folder)
+
+            print(f"🔹 Chunking documents from {folder} ...")
             chunks = chunk_documents(docs)
+
+            print(f"✅ Finished folder: {folder} | Chunks added: {len(chunks)}")
             all_chunks.extend(chunks)
         else:
             print(f"⚠️ Skipping empty folder: {folder}")
@@ -35,22 +41,22 @@ def build_full_pipeline():
     if os.path.exists(crop_csv):
         all_chunks.extend(load_crop_production_csv(crop_csv))
     else:
-        print(f"⚠️ Crop CSV not found: {crop_csv}")
+        print(f"Crop CSV not found: {crop_csv}")
 
     if os.path.exists(mandi_csv):
         all_chunks.extend(load_mandi_prices_csv(mandi_csv))
     else:
-        print(f"⚠️ Mandi CSV not found: {mandi_csv}")
+        print(f"Mandi CSV not found: {mandi_csv}")
 
-    print(f"\n📦 Total chunks to embed: {len(all_chunks)}")
+    print(f"\nTotal chunks to upload: {len(all_chunks)}")
 
     if all_chunks:
         vectorstore = build_vectorstore(all_chunks)
-        print("\n🎉 Pipeline complete! Vector store is ready.")
+        print("\nPinecone pipeline complete.")
         return vectorstore
     else:
         raise ValueError("No documents found. Add PDFs/CSVs to data/ folder first.")
 
-
 if __name__ == "__main__":
     build_full_pipeline()
+

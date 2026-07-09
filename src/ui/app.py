@@ -164,24 +164,6 @@ with tab2:
                 st.success("✅ Price Advisory Ready!")
                 st.markdown(answer)
 
-                # Placeholder historical price chart
-                st.subheader("📊 Historical Price Trend")
-                price_data = pd.DataFrame({
-                    "Month": [
-                        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-                    ],
-                    "Price (₹/Quintal)": [
-                        1800, 1850, 1900, 1780, 1820, 1950,
-                        2000, 1980, 1870, 1760, 1800, 1900
-                    ]
-                })
-                st.line_chart(price_data.set_index("Month"))
-                st.caption(
-                    "Note: Chart shows indicative historical price trend. "
-                    "Actual prices vary by mandi and date."
-                )
-
             except Exception as e:
                 st.error(f"Error: {e}")
 
